@@ -1,4 +1,4 @@
-package main
+package rest
 
 import (
 	"encoding/json"
@@ -108,7 +108,7 @@ var mutationType = graphql.NewObject(graphql.ObjectConfig{
 	},
 })
 
-func main() {
+func Diff() {
 	// Schema
 	fields := graphql.Fields{
 		"tutorial": &graphql.Field{

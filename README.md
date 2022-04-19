@@ -8,5 +8,5 @@
 
 ## Which GrpahQL Package are you gonna use ?
 
-- 1. Go grpahQL
+- 1. [Go grpahQL](https://tutorialedge.net/golang/go-graphql-beginners-tutorial/)
   - don't like it becaz not supporting the webpage
