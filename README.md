@@ -10,3 +10,8 @@
 
 - 1. [Go grpahQL](https://tutorialedge.net/golang/go-graphql-beginners-tutorial/)
   - don't like it becaz not supporting the webpage
+
+## PostgreSQL
+
+- Need to study sql
+  [Postgresql](https://www.calhoun.io/connecting-to-a-postgresql-database-with-gos-database-sql-package/)
