@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/graphql-go/handler"
-	"github.com/guiwoo/exercise_backend/graphql/schema"
+	schema "github.com/guiwoo/exercise_backend/graphql/schema"
 )
 
 var PORT string

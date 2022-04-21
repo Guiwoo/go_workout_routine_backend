@@ -1,10 +1,10 @@
 package model
 
 import (
-	"database/sql"
 	"fmt"
 	"log"
 
+	"github.com/go-xorm/xorm"
 	_ "github.com/lib/pq"
 )
 
@@ -16,20 +16,25 @@ const (
 	DB_NAME     = "guiwoopark"
 )
 
-func DBOpen() {
+var (
+	en  *xorm.Engine
+	err error
+)
+
+func init() {
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
 		"password=%s dbname=%s sslmode=disable",
 		DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME)
-	db, err := sql.Open("postgres", psqlInfo)
+	en, err = xorm.NewEngine("postgres", psqlInfo)
 	if err != nil {
-		panic(err)
+		log.Panic("Engine creation fialed", err)
 	}
-	defer db.Close()
-	statement, err := db.Prepare("CREATE TABLE tutorials (id int, tutorial_name text);")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer statement.Close()
-	statement.Exec()
-	fmt.Println("Successfully Connected")
+}
+
+func DBOpen() {
+	en.Sync(new(User_Type))
+}
+
+func DbHandler() *xorm.Engine {
+	return en
 }

@@ -15,3 +15,7 @@
 
 - Need to study sql
   [Postgresql](https://www.calhoun.io/connecting-to-a-postgresql-database-with-gos-database-sql-package/)
+- Gorm vs Xorm
+  - Gorm has 20k stars, Xorm has 6.3k stars
+- Xorm why ? faster than gorm on the bench testing
+  [Check here](https://sumit-agarwal.medium.com/gorm-vs-xorm-part-1-d156ba9de404)
