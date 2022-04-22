@@ -31,10 +31,18 @@ func init() {
 	}
 }
 
-func DBOpen() {
+func DB_Connect() {
+	db_sync()
+}
+
+func Close() {
+	en.Close()
+}
+
+func db_sync() {
 	en.Sync(new(User_Type))
 }
 
-func DbHandler() *xorm.Engine {
+func DB_Handler() *xorm.Engine {
 	return en
 }

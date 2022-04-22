@@ -1,6 +1,8 @@
 package user
 
-import "github.com/graphql-go/graphql"
+import (
+	"github.com/graphql-go/graphql"
+)
 
 type User struct {
 	ID       int    `json:"id"`
@@ -8,6 +10,18 @@ type User struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
 }
+
+var MutationReturnType = graphql.NewObject(graphql.ObjectConfig{
+	Name: "Return",
+	Fields: graphql.Fields{
+		"ok": &graphql.Field{
+			Type: graphql.Boolean,
+		},
+		"error": &graphql.Field{
+			Type: graphql.String,
+		},
+	},
+})
 
 var UserType = graphql.NewObject(graphql.ObjectConfig{
 	Name: "User",

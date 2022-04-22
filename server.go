@@ -10,7 +10,9 @@ import (
 const defaultPort = "8080"
 
 func main() {
-	model.DBOpen()
+	model.DB_Connect()
+	defer model.Close()
+
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = defaultPort
