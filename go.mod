@@ -22,6 +22,7 @@ require (
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/stretchr/testify v1.7.1 // indirect
 	github.com/urfave/cli/v2 v2.3.0 // indirect
+	golang.org/x/crypto v0.0.0-20220411220226-7b82a4e95df4 // indirect
 	golang.org/x/mod v0.5.1 // indirect
 	golang.org/x/sys v0.0.0-20211019181941-9d821ace8654 // indirect
 	golang.org/x/tools v0.1.9 // indirect
