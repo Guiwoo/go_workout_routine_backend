@@ -20,3 +20,17 @@ var CreateUser = &graphql.Field{
 	},
 	Resolve: CreateUserService,
 }
+
+var LoginUser = &graphql.Field{
+	Type:        LoginReturnType, // return type for this field
+	Description: "Create a new user",
+	Args: graphql.FieldConfigArgument{
+		"email": &graphql.ArgumentConfig{
+			Type: graphql.NewNonNull(graphql.String),
+		},
+		"password": &graphql.ArgumentConfig{
+			Type: graphql.NewNonNull(graphql.String),
+		},
+	},
+	Resolve: LoginUserService,
+}

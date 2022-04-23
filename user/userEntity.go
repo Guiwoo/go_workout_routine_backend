@@ -23,6 +23,21 @@ var MutationReturnType = graphql.NewObject(graphql.ObjectConfig{
 	},
 })
 
+var LoginReturnType = graphql.NewObject(graphql.ObjectConfig{
+	Name: "LoginReturnType",
+	Fields: graphql.Fields{
+		"ok": &graphql.Field{
+			Type: graphql.Boolean,
+		},
+		"error": &graphql.Field{
+			Type: graphql.String,
+		},
+		"token": &graphql.Field{
+			Type: graphql.String,
+		},
+	},
+})
+
 var UserType = graphql.NewObject(graphql.ObjectConfig{
 	Name: "User",
 	Fields: graphql.Fields{

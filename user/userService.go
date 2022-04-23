@@ -2,6 +2,7 @@ package user
 
 import (
 	"errors"
+	"fmt"
 	"log"
 
 	"github.com/graphql-go/graphql"
@@ -16,11 +17,29 @@ type MutationReturn struct {
 	Error string `json:"error"`
 }
 
-var service = model.DB_Handler()
+type LoginReturn struct {
+	Ok    bool   `json:"ok"`
+	Error string `json:"error"`
+	Token string `json:"token"`
+}
+
+var (
+	service = model.DB_Handler()
+	JwtKey  = []byte("HolyWak")
+)
 
 func hashPassword(password string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), Cost)
 	return string(bytes), err
+}
+
+func checkPasswordHash(password, hash string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+	return err == nil
+}
+
+func generateToken() string {
+	return ""
 }
 
 var CreateUserService = func(p graphql.ResolveParams) (interface{}, error) {
@@ -39,4 +58,22 @@ var CreateUserService = func(p graphql.ResolveParams) (interface{}, error) {
 	password, _ = hashPassword(password)
 	service.Insert(&model.User_Type{Name: name, Email: email, Password: password})
 	return &MutationReturn{Ok: true, Error: "nil"}, nil
+}
+
+var LoginUserService = func(p graphql.ResolveParams) (interface{}, error) {
+	var findUsers []model.User_Type
+	email, _ := p.Args["email"].(string)
+	password, _ := p.Args["password"].(string)
+	fmt.Println(email, password)
+	err := service.In("email", email).Find(&findUsers)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if len(findUsers) < 1 {
+		return LoginReturn{Ok: false, Error: "could not find the email", Token: ""}, errors.New("could not find the email")
+	}
+	if ok := checkPasswordHash(password, findUsers[0].Password); !ok {
+		return LoginReturn{Ok: false, Error: "password is not correct", Token: ""}, errors.New("password is not correct")
+	}
+	return LoginReturn{Ok: true, Error: "lala", Token: "have no ideda what should i type here"}, nil
 }
