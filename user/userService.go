@@ -2,9 +2,10 @@ package user
 
 import (
 	"errors"
-	"fmt"
 	"log"
+	"time"
 
+	"github.com/golang-jwt/jwt"
 	"github.com/graphql-go/graphql"
 	"github.com/guiwoo/exercise_backend/model"
 	"golang.org/x/crypto/bcrypt"
@@ -23,6 +24,11 @@ type LoginReturn struct {
 	Token string `json:"token"`
 }
 
+type Claims struct {
+	Email string `json:"email"`
+	jwt.StandardClaims
+}
+
 var (
 	service = model.DB_Handler()
 	JwtKey  = []byte("HolyWak")
@@ -38,8 +44,20 @@ func checkPasswordHash(password, hash string) bool {
 	return err == nil
 }
 
-func generateToken() string {
-	return ""
+func generateToken(email string) string {
+	expirationTime := time.Now().Add(10 * time.Hour)
+	claims := &Claims{
+		Email: email,
+		StandardClaims: jwt.StandardClaims{
+			ExpiresAt: expirationTime.Unix(),
+		},
+	}
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	tokenString, err := token.SignedString(JwtKey)
+	if err != nil {
+		return ""
+	}
+	return tokenString
 }
 
 var CreateUserService = func(p graphql.ResolveParams) (interface{}, error) {
@@ -64,7 +82,6 @@ var LoginUserService = func(p graphql.ResolveParams) (interface{}, error) {
 	var findUsers []model.User_Type
 	email, _ := p.Args["email"].(string)
 	password, _ := p.Args["password"].(string)
-	fmt.Println(email, password)
 	err := service.In("email", email).Find(&findUsers)
 	if err != nil {
 		log.Fatal(err)
@@ -75,5 +92,6 @@ var LoginUserService = func(p graphql.ResolveParams) (interface{}, error) {
 	if ok := checkPasswordHash(password, findUsers[0].Password); !ok {
 		return LoginReturn{Ok: false, Error: "password is not correct", Token: ""}, errors.New("password is not correct")
 	}
-	return LoginReturn{Ok: true, Error: "lala", Token: "have no ideda what should i type here"}, nil
+	token := generateToken(email)
+	return LoginReturn{Ok: true, Error: "lala", Token: token}, nil
 }
