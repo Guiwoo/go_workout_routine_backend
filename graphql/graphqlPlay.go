@@ -1,6 +1,7 @@
 package graphql
 
 import (
+	"context"
 	"log"
 	"net/http"
 
@@ -18,6 +19,9 @@ func GraphQLStart(port string) {
 		Pretty:     true,
 		GraphiQL:   false,
 		Playground: true,
+		RootObjectFn: func(ctx context.Context, r *http.Request) map[string]interface{} {
+			return make(map[string]interface{})
+		},
 	})
 
 	http.Handle("/graphql", graphqlHandler)

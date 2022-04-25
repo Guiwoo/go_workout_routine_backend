@@ -93,5 +93,8 @@ var LoginUserService = func(p graphql.ResolveParams) (interface{}, error) {
 		return LoginReturn{Ok: false, Error: "password is not correct", Token: ""}, errors.New("password is not correct")
 	}
 	token := generateToken(email)
+	rootvalue := p.Info.RootValue.(map[string]interface{})
+	rootvalue["token"] = token // header check ? nope ? just rootvalue ?
+	//i think i can get some information from p.Info or context things need to search
 	return LoginReturn{Ok: true, Error: "lala", Token: token}, nil
 }
