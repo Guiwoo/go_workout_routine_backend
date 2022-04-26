@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/graphql-go/handler"
 	schema "github.com/guiwoo/exercise_backend/graphql/schema"
@@ -20,7 +21,10 @@ func GraphQLStart(port string) {
 		GraphiQL:   false,
 		Playground: true,
 		RootObjectFn: func(ctx context.Context, r *http.Request) map[string]interface{} {
-			return make(map[string]interface{})
+			holy := r.Header["Jwt"]
+			TheMap := make(map[string]interface{})
+			TheMap["jwt"] = strings.Join(holy, "")
+			return TheMap
 		},
 	})
 

@@ -60,6 +60,23 @@ func generateToken(email string) string {
 	return tokenString
 }
 
+func verifyingToken(token string) bool {
+	claims := &Claims{}
+	tkn, err := jwt.ParseWithClaims(token, claims, func(t *jwt.Token) (interface{}, error) {
+		return JwtKey, nil
+	})
+	if err != nil {
+		if err == jwt.ErrSignatureInvalid {
+			return false
+		}
+		return false
+	}
+	if !tkn.Valid {
+		return false
+	}
+	return true
+}
+
 var CreateUserService = func(p graphql.ResolveParams) (interface{}, error) {
 	name, _ := p.Args["name"].(string)
 	email, _ := p.Args["email"].(string)
@@ -93,8 +110,21 @@ var LoginUserService = func(p graphql.ResolveParams) (interface{}, error) {
 		return LoginReturn{Ok: false, Error: "password is not correct", Token: ""}, errors.New("password is not correct")
 	}
 	token := generateToken(email)
-	rootvalue := p.Info.RootValue.(map[string]interface{})
-	rootvalue["token"] = token // header check ? nope ? just rootvalue ?
-	//i think i can get some information from p.Info or context things need to search
 	return LoginReturn{Ok: true, Error: "lala", Token: token}, nil
+}
+
+var EditUserService = func(p graphql.ResolveParams) (interface{}, error) {
+	// email, _ := p.Args["email"].(string)
+	// name, _ := p.Args["name"].(string)
+	// password, _ := p.Args["password"].(string)
+	holy := p.Info.RootValue.(map[string]interface{})
+	jwt, ok := holy["jwt"]
+	if !ok {
+		return &MutationReturn{Ok: false, Error: "Need to Login Account First"}, nil
+	}
+	ok = verifyingToken(jwt.(string))
+	if !ok {
+		return &MutationReturn{Ok: false, Error: "Need to Login Account First"}, nil
+	}
+	return &MutationReturn{Ok: true, Error: "nil"}, nil
 }

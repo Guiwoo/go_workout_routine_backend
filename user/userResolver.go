@@ -34,3 +34,20 @@ var LoginUser = &graphql.Field{
 	},
 	Resolve: LoginUserService,
 }
+
+var EditUser = &graphql.Field{
+	Type:        MutationReturnType,
+	Description: "Edit a User",
+	Args: graphql.FieldConfigArgument{
+		"name": &graphql.ArgumentConfig{
+			Type: graphql.String,
+		},
+		"email": &graphql.ArgumentConfig{
+			Type: graphql.String,
+		},
+		"password": &graphql.ArgumentConfig{
+			Type: graphql.String,
+		},
+	},
+	Resolve: EditUserService,
+}
