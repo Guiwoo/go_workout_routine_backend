@@ -131,14 +131,23 @@ var EditUserService = func(p graphql.ResolveParams) (interface{}, error) {
 		return &MutationReturn{Ok: false, Error: "Need to Login Account First"}, nil
 	}
 	if name != "" {
-		user := new(model.User_Type)
-		user.Name = name
-		affected, err := service.ID(id).Update(user)
+		var findUsers []model.User_Type
+		err := service.In("name", name).Find(&findUsers)
 		if err != nil {
 			log.Fatal(err)
 		}
-		if affected < 1 {
-			return &MutationReturn{Ok: false, Error: "Update failed"}, nil
+		if len(findUsers) < 1 {
+			user := new(model.User_Type)
+			user.Name = name
+			affected, err := service.ID(id).Update(user)
+			if err != nil {
+				log.Fatal(err)
+			}
+			if affected < 1 {
+				return &MutationReturn{Ok: false, Error: "Update failed"}, nil
+			}
+		} else {
+			return &MutationReturn{Ok: false, Error: "Duplicate Nicname"}, nil
 		}
 	}
 	return &MutationReturn{Ok: true, Error: "nil"}, nil
