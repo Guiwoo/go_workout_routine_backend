@@ -3,7 +3,7 @@ package model
 import "time"
 
 type User_Type struct {
-	ID        int64 `xorm:"id pk autoincr"`
+	ID        int64 `xorm:"id pk"`
 	Name      string
 	Email     string
 	Password  string
