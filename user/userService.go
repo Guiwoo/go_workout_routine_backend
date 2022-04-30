@@ -2,13 +2,12 @@ package user
 
 import (
 	"errors"
-	"fmt"
 	"log"
-	"time"
 
-	"github.com/golang-jwt/jwt"
 	"github.com/graphql-go/graphql"
+	"github.com/guiwoo/exercise_backend/jwtValidator"
 	"github.com/guiwoo/exercise_backend/model"
+
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -25,15 +24,8 @@ type LoginReturn struct {
 	Token string `json:"token"`
 }
 
-type Claims struct {
-	Email string `json:"email"`
-	Id    int64  `json:"id"`
-	jwt.StandardClaims
-}
-
 var (
 	service = model.DB_Handler()
-	JwtKey  = []byte("HolyWak")
 )
 
 func hashPassword(password string) (string, error) {
@@ -44,42 +36,6 @@ func hashPassword(password string) (string, error) {
 func checkPasswordHash(password, hash string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
 	return err == nil
-}
-
-func generateToken(email string, id int64) string {
-	expirationTime := time.Now().Add(10 * time.Hour)
-	claims := &Claims{
-		Email: email,
-		Id:    id,
-		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: expirationTime.Unix(),
-		},
-	}
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err := token.SignedString(JwtKey)
-	if err != nil {
-		return ""
-	}
-	return tokenString
-}
-
-func verifyingToken(token string) (bool, int64) {
-	claims := &Claims{}
-	tkn, err := jwt.ParseWithClaims(token, claims, func(t *jwt.Token) (interface{}, error) {
-		return []byte(JwtKey), nil
-	})
-	fmt.Println(tkn.Claims.(*Claims).Id)
-	if err != nil {
-		if err == jwt.ErrSignatureInvalid {
-			return false, 0
-		}
-		return false, 0
-	}
-	if !tkn.Valid {
-		return false, 0
-	}
-	id := tkn.Claims.(*Claims).Id
-	return true, id
 }
 
 var CreateUserService = func(p graphql.ResolveParams) (interface{}, error) {
@@ -114,28 +70,21 @@ var LoginUserService = func(p graphql.ResolveParams) (interface{}, error) {
 	if ok := checkPasswordHash(password, findUsers[0].Password); !ok {
 		return LoginReturn{Ok: false, Error: "password is not correct", Token: ""}, errors.New("password is not correct")
 	}
-	token := generateToken(email, findUsers[0].ID)
+	token := jwtValidator.GenerateToken(email, findUsers[0].ID)
 	return LoginReturn{Ok: true, Error: "lala", Token: token}, nil
 }
 
 var EditUserService = func(p graphql.ResolveParams) (interface{}, error) {
 	name, _ := p.Args["name"].(string)
-	// password, _ := p.Args["password"].(string)
-	holy := p.Info.RootValue.(map[string]interface{})
-	jwt, ok := holy["jwt"]
-	if !ok {
-		return &MutationReturn{Ok: false, Error: "Need to Login Account First"}, nil
-	}
-	ok, id := verifyingToken(jwt.(string))
-	if !ok {
-		return &MutationReturn{Ok: false, Error: "Need to Login Account First"}, nil
-	}
+	password, _ := p.Args["password"].(string)
+	id, _ := jwtValidator.JwtValidChecker(p)
 	if name != "" {
 		var findUsers []model.User_Type
 		err := service.In("name", name).Find(&findUsers)
 		if err != nil {
 			log.Fatal(err)
 		}
+		// duplicate check
 		if len(findUsers) < 1 {
 			user := new(model.User_Type)
 			user.Name = name
@@ -150,5 +99,24 @@ var EditUserService = func(p graphql.ResolveParams) (interface{}, error) {
 			return &MutationReturn{Ok: false, Error: "Duplicate Nicname"}, nil
 		}
 	}
+	// if password is not empty
+	if password != "" {
+		if len(password) < 3 {
+			return &MutationReturn{Ok: false, Error: "Password should be longer than 3 characters"}, nil
+		}
+		user := new(model.User_Type)
+		newPassword, _ := hashPassword(password)
+		user.Password = newPassword
+		affected, err := service.ID(id).Update(user)
+		if err != nil {
+			log.Fatal(err)
+		}
+		if affected < 1 {
+			return &MutationReturn{Ok: false, Error: "Update failed"}, nil
+		}
+	}
 	return &MutationReturn{Ok: true, Error: "nil"}, nil
+}
+var FindUserService = func(p graphql.ResolveParams) (interface{}, error) {
+	return "", nil
 }
