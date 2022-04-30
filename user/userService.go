@@ -2,11 +2,13 @@ package user
 
 import (
 	"errors"
+	"fmt"
 	"log"
 
 	"github.com/graphql-go/graphql"
 	"github.com/guiwoo/exercise_backend/jwtValidator"
 	"github.com/guiwoo/exercise_backend/model"
+	"github.com/guiwoo/exercise_backend/utils"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -22,6 +24,12 @@ type LoginReturn struct {
 	Ok    bool   `json:"ok"`
 	Error string `json:"error"`
 	Token string `json:"token"`
+}
+
+type FindUserReturn struct {
+	Ok    bool              `json:"ok"`
+	Error string            `json:"error"`
+	Users []model.User_Type `json:"users"`
 }
 
 var (
@@ -117,6 +125,18 @@ var EditUserService = func(p graphql.ResolveParams) (interface{}, error) {
 	}
 	return &MutationReturn{Ok: true, Error: "nil"}, nil
 }
+
+// find a user by name, don't need to log-in
 var FindUserService = func(p graphql.ResolveParams) (interface{}, error) {
-	return "", nil
+	var result []model.User_Type
+	name := p.Args["name"].(string)
+	if len(name) < 3 {
+		return &FindUserReturn{Ok: false, Error: "Search Name characters at least 3", Users: result}, nil
+	}
+	//if those letter include in name or startwith ?
+	sql := "SELECT * from User__Type WHERE (lower(name) LIKE '%" + name + "%')"
+	res, err := service.Exec(sql)
+	utils.HandleErr(err)
+	fmt.Println(res)
+	return &FindUserReturn{Ok: true, Users: result}, nil
 }

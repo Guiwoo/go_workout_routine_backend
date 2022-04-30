@@ -38,6 +38,21 @@ var LoginReturnType = graphql.NewObject(graphql.ObjectConfig{
 	},
 })
 
+var FindUserReturnType = graphql.NewObject(graphql.ObjectConfig{
+	Name: "FindUsersReturnType",
+	Fields: graphql.Fields{
+		"ok": &graphql.Field{
+			Type: graphql.Boolean,
+		},
+		"error": &graphql.Field{
+			Type: graphql.String,
+		},
+		"users": &graphql.Field{
+			Type: graphql.NewList(UserType),
+		},
+	},
+})
+
 var UserType = graphql.NewObject(graphql.ObjectConfig{
 	Name: "User",
 	Fields: graphql.Fields{
