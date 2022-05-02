@@ -2,7 +2,6 @@ package user
 
 import (
 	"errors"
-	"fmt"
 	"log"
 
 	"github.com/graphql-go/graphql"
@@ -57,10 +56,17 @@ var CreateUserService = func(p graphql.ResolveParams) (interface{}, error) {
 		log.Fatal(err)
 	}
 	if has {
-		return &MutationReturn{Ok: false, Error: "email has already taken"}, errors.New("email has already taken")
+		return &MutationReturn{Ok: false, Error: "email has already taken"}, nil
 	}
 	password, _ = hashPassword(password)
-	service.Insert(&model.User_Type{Name: name, Email: email, Password: password})
+	user.Name = name
+	user.Password = password
+	affected, err := service.Insert(user)
+	utils.HandleErr(err)
+	if affected != 1 {
+		log.Fatal("Engine affected not 1 column")
+		return &MutationReturn{Ok: false, Error: "Fail to create account"}, nil
+	}
 	return &MutationReturn{Ok: true, Error: "nil"}, nil
 }
 
@@ -133,10 +139,10 @@ var FindUserService = func(p graphql.ResolveParams) (interface{}, error) {
 	if len(name) < 3 {
 		return &FindUserReturn{Ok: false, Error: "Search Name characters at least 3", Users: result}, nil
 	}
-	//if those letter include in name or startwith ?
 	sql := "SELECT * from User__Type WHERE (lower(name) LIKE '%" + name + "%')"
-	res, err := service.Exec(sql)
+	err := service.SQL(sql).Find(&result) // => 리턴 정확하게 User_Type 으로 반환
 	utils.HandleErr(err)
-	fmt.Println(res)
+	// results, err := service.Query(sql) //=> String 으로 반환해서 어떻게 User_Type 으로 변환해야할지 잘모르겠습니다. ㅠ
+	utils.HandleErr(err)
 	return &FindUserReturn{Ok: true, Users: result}, nil
 }
