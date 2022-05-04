@@ -26,10 +26,20 @@
 
 - [x] hashing passsword
 
-[] login user
+[x] login user
 
 - [x] send back jwt token if it's currect information in the header
   - BUT NOT SURE HOW TO CHECK HEADER instead use rootValue
   - Need to Check another query
     - About header and rootValue
 - [x] if jwt-token on header ? pass the query
+
+## Work
+
+- Struct ID Name Target
+- [] I Need a UnionType,do i need for enumtype ? 0 1 2 3 4 5 like this and transfer to sepcific string
+  - Quite good idea i guess
+
+## Routine
+
+- time,Author,Like,LEvel,Id,Name
