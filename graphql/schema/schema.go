@@ -17,7 +17,8 @@ var rootMutation = graphql.NewObject(graphql.ObjectConfig{
 var rootQuery = graphql.NewObject(graphql.ObjectConfig{
 	Name: "RootQuery",
 	Fields: graphql.Fields{
-		"findUser": user.FindUser,
+		"findUser": user.SearchUser,
+		"oneUser":  user.FindUserById,
 	},
 })
 

@@ -53,13 +53,24 @@ var EditUser = &graphql.Field{
 }
 
 // Query
-var FindUser = &graphql.Field{
-	Type:        FindUserReturnType,
-	Description: "Find users",
+var SearchUser = &graphql.Field{
+	Type:        SearchUserReturnType,
+	Description: "Search users",
 	Args: graphql.FieldConfigArgument{
 		"name": &graphql.ArgumentConfig{
 			Type: graphql.String,
 		},
 	},
-	Resolve: FindUserService,
+	Resolve: SearchUserService,
+}
+
+var FindUserById = &graphql.Field{
+	Type:        FindOneUserReturnType,
+	Description: "Find Users by id",
+	Args: graphql.FieldConfigArgument{
+		"id": &graphql.ArgumentConfig{
+			Type: graphql.Int,
+		},
+	},
+	Resolve: FindUserByIdService,
 }

@@ -23,6 +23,21 @@ var MutationReturnType = graphql.NewObject(graphql.ObjectConfig{
 	},
 })
 
+var UserType = graphql.NewObject(graphql.ObjectConfig{
+	Name: "User",
+	Fields: graphql.Fields{
+		"id": &graphql.Field{
+			Type: graphql.Int,
+		},
+		"name": &graphql.Field{
+			Type: graphql.String,
+		},
+		"email": &graphql.Field{
+			Type: graphql.String,
+		},
+	},
+})
+
 var LoginReturnType = graphql.NewObject(graphql.ObjectConfig{
 	Name: "LoginReturnType",
 	Fields: graphql.Fields{
@@ -38,8 +53,8 @@ var LoginReturnType = graphql.NewObject(graphql.ObjectConfig{
 	},
 })
 
-var FindUserReturnType = graphql.NewObject(graphql.ObjectConfig{
-	Name: "FindUsersReturnType",
+var SearchUserReturnType = graphql.NewObject(graphql.ObjectConfig{
+	Name: "SearchUsersReturnType",
 	Fields: graphql.Fields{
 		"ok": &graphql.Field{
 			Type: graphql.Boolean,
@@ -53,20 +68,17 @@ var FindUserReturnType = graphql.NewObject(graphql.ObjectConfig{
 	},
 })
 
-var UserType = graphql.NewObject(graphql.ObjectConfig{
-	Name: "User",
+var FindOneUserReturnType = graphql.NewObject(graphql.ObjectConfig{
+	Name: "GetOneUser",
 	Fields: graphql.Fields{
-		"id": &graphql.Field{
-			Type: graphql.Int,
+		"ok": &graphql.Field{
+			Type: graphql.Boolean,
 		},
-		"name": &graphql.Field{
+		"error": &graphql.Field{
 			Type: graphql.String,
 		},
-		"email": &graphql.Field{
-			Type: graphql.String,
-		},
-		"password": &graphql.Field{
-			Type: graphql.String,
+		"user": &graphql.Field{
+			Type: UserType,
 		},
 	},
 })

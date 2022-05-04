@@ -2,6 +2,7 @@ package user
 
 import (
 	"errors"
+	"fmt"
 	"log"
 
 	"github.com/graphql-go/graphql"
@@ -29,6 +30,12 @@ type FindUserReturn struct {
 	Ok    bool              `json:"ok"`
 	Error string            `json:"error"`
 	Users []model.User_Type `json:"users"`
+}
+
+type oneUserReturn struct {
+	Ok    bool            `json:"ok"`
+	Error string          `json:"error"`
+	User  model.User_Type `json:"user"`
 }
 
 var (
@@ -133,7 +140,7 @@ var EditUserService = func(p graphql.ResolveParams) (interface{}, error) {
 }
 
 // find a user by name, don't need to log-in
-var FindUserService = func(p graphql.ResolveParams) (interface{}, error) {
+var SearchUserService = func(p graphql.ResolveParams) (interface{}, error) {
 	var result []model.User_Type
 	name := p.Args["name"].(string)
 	if len(name) < 3 {
@@ -142,7 +149,17 @@ var FindUserService = func(p graphql.ResolveParams) (interface{}, error) {
 	sql := "SELECT * from User__Type WHERE (lower(name) LIKE '%" + name + "%')"
 	err := service.SQL(sql).Find(&result) // => 리턴 정확하게 User_Type 으로 반환
 	utils.HandleErr(err)
-	// results, err := service.Query(sql) //=> String 으로 반환해서 어떻게 User_Type 으로 변환해야할지 잘모르겠습니다. ㅠ
-	utils.HandleErr(err)
 	return &FindUserReturn{Ok: true, Users: result}, nil
+}
+
+// find user by id ,why need ? when click profile send to sepcific page
+var FindUserByIdService = func(p graphql.ResolveParams) (interface{}, error) {
+	var user model.User_Type
+	id := p.Args["id"].(int)
+	has, err := service.ID(id).Get(&user)
+	utils.HandleErr(err)
+	if !has {
+		return &oneUserReturn{Ok: false, Error: fmt.Sprintf("Could not find this user id %d", id)}, nil
+	}
+	return &oneUserReturn{Ok: true, User: user}, nil
 }
