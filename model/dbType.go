@@ -10,3 +10,9 @@ type User_Type struct {
 	CreatedAt time.Time `xorm:"created"`
 	UpdatedAt time.Time `xorm:"updated"`
 }
+
+type Work_Type struct {
+	ID int64 `xorm:"id pk autoincr"`
+	Name string
+	Target string
+}

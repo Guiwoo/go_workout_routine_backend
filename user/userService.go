@@ -146,8 +146,8 @@ var SearchUserService = func(p graphql.ResolveParams) (interface{}, error) {
 	if len(name) < 3 {
 		return &FindUserReturn{Ok: false, Error: "Search Name characters at least 3", Users: result}, nil
 	}
-	sql := "SELECT * from User__Type WHERE (lower(name) LIKE '%" + name + "%')"
-	err := service.SQL(sql).Find(&result) // => 리턴 정확하게 User_Type 으로 반환
+	sql := `SELECT * from User__Type WHERE (lower(name) LIKE CONCAT('%',$1::text,'%'))`
+	err := service.SQL(sql, name).Find(&result) // => 리턴 정확하게 User_Type 으로 반환
 	utils.HandleErr(err)
 	return &FindUserReturn{Ok: true, Users: result}, nil
 }
